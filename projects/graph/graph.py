@@ -1,7 +1,35 @@
 """
 Simple graph implementation
+Copied the stack and queue code in to eliminate the hassle
 """
-from util import Stack, Queue  # These may come in handy
+# from util import Stack, Queue  # These may come in handy
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return len(self.queue)
+
+class Stack():
+    def __init__(self):
+        self.stack = []
+    def push(self, value):
+        self.stack.append(value)
+    def pop(self):
+        if self.size() > 0:
+            return self.stack.pop()
+        else:
+            return None
+    def size(self):
+        return len(self.stack)
+
+# ---------------------------------------------------
 
 class Graph:
 
@@ -13,33 +41,65 @@ class Graph:
         """
         Add a vertex to the graph.
         """
-        pass  # TODO
+        self.vertices[vertex_id] = set() # each ID has a set of edges
 
     def add_edge(self, v1, v2):
         """
         Add a directed edge to the graph.
+        ---
+        Add an edge from v1 to v2 for directed 
+        To create an undirect
+        Check that verts is in the graph
         """
-        pass  # TODO
+        if v1 in self.vertices and v2 in self.vertices:
+            self.vertices[v1].add(v2)
+        else:
+            raise IndexError("Vertex does not exist in graph")
 
     def get_neighbors(self, vertex_id):
         """
         Get all neighbors (edges) of a vertex.
         """
-        pass  # TODO
+        return self.vertices[vertex_id]
 
     def bft(self, starting_vertex):
         """
         Print each vertex in breadth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        q = Queue() # Get a queue
+        q.enqueue(starting_vertex_id)
+        # Need a set to keep track of visited nodes in O(1)
+        visited = set()
+
+        # Repeat until queue is empty
+        while q.size() > 0:
+            #dequeue first vert
+            v = q.dequeue()
+            # If it's not visited only enqueue the neighbors if the vert has not 
+            if v not in visited:
+                visited.add(v) # Mark it as visited
+                # Get the neighbors of the vert
+                for next_vert in self.get_neighbors(v):
+                    q.enqueue(next_vert)
 
     def dft(self, starting_vertex):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
+        Almost identical to the bft
+        We're pushing and popping
         """
-        pass  # TODO
+        s = Stack()
+        s.push(starting_vertex_id)
+        visited = set()
+
+        while s.size() > 0:
+            v = s.pop()
+            if v not in visited:
+                visited.add(v)
+                for next_vert in self.get_neighbors(v):
+                    s.push(next_vert)
 
     def dft_recursive(self, starting_vertex):
         """
@@ -56,7 +116,21 @@ class Graph:
         starting_vertex to destination_vertex in
         breath-first order.
         """
-        pass  # TODO
+        q = Queue()
+        q.enqueue([starting_vertex])
+        visited = set()
+        while q.size() > 0:
+            route = q.dequeue()
+            v = route[ -1 ]
+            if v not in visited: # We have not added this yet
+                if v == destination_vertex:
+                    return route
+                visited.add(v) # prevent looping
+                for next_vert in self.get_neighbors(v):
+                    next_route = list(route)
+                    next_route.append(next_vert)
+                    q.enqueue(next_route)
+        return None 
 
     def dfs(self, starting_vertex, destination_vertex):
         """
